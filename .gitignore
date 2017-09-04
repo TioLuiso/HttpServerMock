@@ -8,3 +8,7 @@
 /HMock/obj/Debug
 /HMockTests/bin/Debug
 /HMockTests/obj/Debug
+/.vs/HttpServerMock/v15/sqlite3
+/.vs/HttpServerMock/v15
+/HMock.Common/bin/Debug
+/HMock.Common/obj

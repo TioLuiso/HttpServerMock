@@ -100,17 +100,17 @@
         /// <value>
         /// <c>true</c> if this request Uri given by the user is Regular expression; otherwise, <c>false</c>.
         /// </value>
-        internal bool IsRequestUriARegex { get; private set; }
+        public bool IsRequestUriARegex { get; private set; }
 
         /// <summary>
         /// Gets the request Regular expression.
         /// </summary>
-        internal Regex RequestRegex { get; private set; }
+        public Regex RequestRegex { get; private set; }
 
         /// <summary>
         /// Gets the request Uri.
         /// </summary>
-        internal Uri RequestUri { get; private set; }
+        public Uri RequestUri { get; private set; }
 
         #endregion
 

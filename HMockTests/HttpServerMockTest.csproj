@@ -43,9 +43,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp">
       <HintPath>..\packages\RestSharp.105.0.1\lib\net4\RestSharp.dll</HintPath>
@@ -84,6 +83,10 @@
     <Compile Include="RequestExpectationTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HMock.Common\HMock.Common.csproj">
+      <Project>{766a8787-f187-4d8f-8bc7-f6389fee67f6}</Project>
+      <Name>HMock.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HMock\HttpServerMock.csproj">
       <Project>{dc788ef5-7f10-44fc-bc06-c80edd7d6435}</Project>
       <Name>HttpServerMock</Name>

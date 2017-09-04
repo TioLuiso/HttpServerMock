@@ -5,9 +5,9 @@
     using System.Collections.ObjectModel;
     using System.Linq;
 
-    internal static class Helper
+    public static class Helper
     {
-        internal static readonly IEnumerable<string> JsonContentTypes = new Collection<string>
+        public static readonly IEnumerable<string> JsonContentTypes = new Collection<string>
                                                        {
                                                            "application/json", 
                                                            "application/x-javascript", 
@@ -18,11 +18,11 @@
                                                            "text/json"
                                                        };
 
-        internal static readonly IEnumerable<string> XmlContentTypes = new Collection<string> { "application/xml", "text/xml" };
-        internal static readonly IEnumerable<string> TextContentType = new Collection<string> { "text/plain" };
-        internal static readonly IEnumerable<string> FormUrlEncodedContentType = new Collection<string> { "application/x-www-form-urlencoded" };
+        public static readonly IEnumerable<string> XmlContentTypes = new Collection<string> { "application/xml", "text/xml" };
+        public static readonly IEnumerable<string> TextContentType = new Collection<string> { "text/plain" };
+        public static readonly IEnumerable<string> FormUrlEncodedContentType = new Collection<string> { "application/x-www-form-urlencoded" };
 
-        internal static string ParseRequestContentType(HttpRequestContentType contentType)
+        public static string ParseRequestContentType(HttpRequestContentType contentType)
         {
             switch (contentType)
             {
@@ -37,7 +37,7 @@
             }
         }
 
-        internal static string ParseResponseContentType(HttpRequestContentType contentType)
+        public static string ParseResponseContentType(HttpRequestContentType contentType)
         {
             switch (contentType)
             {
@@ -52,7 +52,7 @@
             }
         }
 
-        internal static bool IsJsonRequest(string contentType)
+        public static bool IsJsonRequest(string contentType)
         {
             if (string.IsNullOrWhiteSpace(contentType))
             {
@@ -62,7 +62,7 @@
             return JsonContentTypes.Contains(contentType);
         }
 
-        internal static bool IsXmlRequest(string contentType)
+        public static bool IsXmlRequest(string contentType)
         {
             if (string.IsNullOrWhiteSpace(contentType))
             {

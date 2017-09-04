@@ -12,7 +12,7 @@
     using System.Threading.Tasks;
     using System.Xml.Linq;
 
-    internal sealed class HHttpMessageHandler : HttpMessageHandler
+    public sealed class HHttpMessageHandler : HttpMessageHandler
     {
         private readonly ServerRequestsState serverRequestsState;
 
@@ -32,7 +32,7 @@
             {
                 if (requestMock.IsRequestTimedOut)
                 {
-                    Thread.Sleep(120000);
+                    await Task.Delay(120000, cancellationToken);
                     return httpResponse;
                 }
 
