@@ -1,7 +1,5 @@
-﻿namespace HttpServerMock
+﻿namespace HttpServerMock.Common
 {
-    using System;
-
     /// <summary>
     /// Http server request expectation.
     /// </summary>

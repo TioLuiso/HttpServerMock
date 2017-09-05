@@ -1,8 +1,8 @@
-﻿namespace HttpServerMock.ExtensionMethods
-{
-    using System;
-    using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
+namespace HttpServerMock.Common.ExtensionMethods
+{
     /// <summary>
     /// Defines extension methods for requests.
     /// </summary>

@@ -1,10 +1,10 @@
-﻿namespace HttpServerMock
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Net.Http;
-    using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 
+namespace HttpServerMock.Common
+{
     /// <summary>
     /// This is the base class for all the request mock classes of this library such as RequestExpectation and RequestBehavior;
     /// </summary>

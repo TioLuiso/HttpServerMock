@@ -1,10 +1,10 @@
-﻿namespace HttpServerMock
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 
+namespace HttpServerMock.Common
+{
     /// <summary>
     /// Defines the members of a request mock response.
     /// </summary>

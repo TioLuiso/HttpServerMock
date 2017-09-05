@@ -1,10 +1,10 @@
-﻿namespace HttpServerMock
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
+namespace HttpServerMock.Common
+{
     public static class Helper
     {
         public static readonly IEnumerable<string> JsonContentTypes = new Collection<string>

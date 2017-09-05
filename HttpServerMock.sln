@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpServerMock", "HMock\Htt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpServerMockTest", "HMockTests\HttpServerMockTest.csproj", "{F7647008-4040-42D3-9104-1A5A1901CE2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HMock.Common", "HMock.Common\HMock.Common.csproj", "{766A8787-F187-4D8F-8BC7-F6389FEE67F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpServerMock.Common", "HMock.Common\HttpServerMock.Common.csproj", "{766A8787-F187-4D8F-8BC7-F6389FEE67F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

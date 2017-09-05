@@ -81,9 +81,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HMock.Common\HMock.Common.csproj">
+    <ProjectReference Include="..\HMock.Common\HttpServerMock.Common.csproj">
       <Project>{766a8787-f187-4d8f-8bc7-f6389fee67f6}</Project>
-      <Name>HMock.Common</Name>
+      <Name>HttpServerMock.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -83,9 +83,9 @@
     <Compile Include="RequestExpectationTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HMock.Common\HMock.Common.csproj">
+    <ProjectReference Include="..\HMock.Common\HttpServerMock.Common.csproj">
       <Project>{766a8787-f187-4d8f-8bc7-f6389fee67f6}</Project>
-      <Name>HMock.Common</Name>
+      <Name>HttpServerMock.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\HMock\HttpServerMock.csproj">
       <Project>{dc788ef5-7f10-44fc-bc06-c80edd7d6435}</Project>

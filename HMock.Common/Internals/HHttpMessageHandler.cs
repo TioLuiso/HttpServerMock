@@ -1,17 +1,16 @@
-﻿namespace HttpServerMock.Internals
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace HttpServerMock.Common.Internals
 {
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Xml.Linq;
-
     public sealed class HHttpMessageHandler : HttpMessageHandler
     {
         private readonly ServerRequestsState serverRequestsState;

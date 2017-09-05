@@ -1,11 +1,11 @@
 ﻿
-namespace HttpServerMock.ExtensionMethods
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Net.Http;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 
+namespace HttpServerMock.Common.ExtensionMethods
+{
     /// <summary>
     /// Extension methods for RequestExpectation class.
     /// </summary>

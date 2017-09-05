@@ -1,9 +1,9 @@
-﻿namespace HttpServerMock
-{
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Net;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Net;
 
+namespace HttpServerMock.Common
+{
     /// <summary>
     /// Contains the Http mock server requests state.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿namespace HttpServerMock
+﻿namespace HttpServerMock.Common
 {
     /// <summary>
     /// Available request content types.
