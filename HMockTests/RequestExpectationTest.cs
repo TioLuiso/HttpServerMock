@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using HttpServerMock.Common;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HttpServerMockTests
 {

@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using HttpServerMock.Common;
+using HttpServerMock.Common.ExtensionMethods;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HttpServerMockTests
 {
@@ -15,7 +17,7 @@ namespace HttpServerMockTests
     using System.Net.Http;
     using System.Net.Http.Headers;
 
-    using HttpMethod = HttpServerMock.HttpMethod;
+    using HttpMethod = HttpServerMock.Common.HttpMethod;
 
     [TestClass]
     public class HttpServerMockTest
@@ -859,10 +861,10 @@ namespace HttpServerMockTests
                     .TimedOut();
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23") { Method = Method.GET };
+                var request = new RestRequest("/user/23") { Method = Method.GET , Timeout = 100};
 
                 var response = restClient.Execute(request);
-                Assert.AreEqual(response.ErrorMessage, "The operation has timed out", "The request does not timed out.");
+                Assert.AreEqual(ResponseStatus.TimedOut, response.ResponseStatus, "The request does not timed out.");
             }
         }
         #endregion

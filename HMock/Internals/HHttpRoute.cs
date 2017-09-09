@@ -1,4 +1,7 @@
-﻿namespace HttpServerMock.Internals
+﻿using HttpServerMock.Common;
+using HttpServerMock.Common.Internals;
+
+namespace HttpServerMock.Internals
 {
     using System.Collections.Generic;
     using System.Net.Http;

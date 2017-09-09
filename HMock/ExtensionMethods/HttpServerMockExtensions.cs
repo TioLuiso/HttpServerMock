@@ -1,4 +1,6 @@
-﻿namespace HttpServerMock.ExtensionMethods
+﻿using HttpServerMock.Common;
+
+namespace HttpServerMock.ExtensionMethods
 {
 
     using global::HttpServerMock.Exceptions;
@@ -8,7 +10,7 @@
     using System.Globalization;
     using System.Linq;
     using System.Net.Http;
-    using HttpMethod = global::HttpServerMock.HttpMethod;
+    using HttpMethod = global::HttpServerMock.Common.HttpMethod;
 
     /// <summary>
     /// Extension methods for HttpServerMock class.
