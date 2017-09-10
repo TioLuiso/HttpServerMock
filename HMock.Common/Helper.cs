@@ -22,36 +22,6 @@ namespace HttpServerMock.Common
         public static readonly IEnumerable<string> TextContentType = new Collection<string> { "text/plain" };
         public static readonly IEnumerable<string> FormUrlEncodedContentType = new Collection<string> { "application/x-www-form-urlencoded" };
 
-        public static string ParseRequestContentType(HttpRequestContentType contentType)
-        {
-            switch (contentType)
-            {
-                case HttpRequestContentType.None:
-                    return string.Empty;
-                case HttpRequestContentType.Json:
-                    return string.Join(",", JsonContentTypes);
-                case HttpRequestContentType.Xml:
-                    return string.Join(",", XmlContentTypes);
-                default:
-                    throw new ArgumentOutOfRangeException("contentType");
-            }
-        }
-
-        public static string ParseResponseContentType(HttpRequestContentType contentType)
-        {
-            switch (contentType)
-            {
-                case HttpRequestContentType.None:
-                    return string.Empty;
-                case HttpRequestContentType.Json:
-                    return "application/json";
-                case HttpRequestContentType.Xml:
-                    return "application/xml";
-                default:
-                    throw new ArgumentOutOfRangeException("contentType");
-            }
-        }
-
         public static bool IsJsonRequest(string contentType)
         {
             if (string.IsNullOrWhiteSpace(contentType))

@@ -1,5 +1,6 @@
 ﻿using HttpServerMock.Common;
 using HttpServerMock.Common.ExtensionMethods;
+using HttpServerMock.Common.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HttpServerMockTests
@@ -17,7 +18,7 @@ namespace HttpServerMockTests
     using System.Net.Http;
     using System.Net.Http.Headers;
 
-    using HttpMethod = HttpServerMock.Common.HttpMethod;
+    using Method = Method;
 
     [TestClass]
     public class HttpServerMockTest
@@ -40,18 +41,18 @@ namespace HttpServerMockTests
         {
             using (var hserver = new HttpServerMock(TestServerPort))
             {
-                hserver.SetUpExpectation(HttpMethod.DELETE, "http://localhost:50000/user/23")
+                hserver.SetUpExpectation(Method.DELETE, "http://localhost:50000/user/23")
                     .ExpectedRequestHeader("test", "test1")
                     .Response(
                         HttpStatusCode.OK,
-                        HttpRequestContentType.Json,
+                        RequestContentType.Json,
                         new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23 });
                 request.AddHeader("test", "test1");
-                request.Method = Method.DELETE;
+                request.Method = RestSharp.Method.DELETE;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -76,14 +77,14 @@ namespace HttpServerMockTests
                     .ExpectedRequestHeader("test", "test1")
                     .Response(
                         HttpStatusCode.OK,
-                        HttpRequestContentType.Json,
+                        RequestContentType.Json,
                         new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23 });
                 request.AddHeader("test", "test1");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -105,15 +106,15 @@ namespace HttpServerMockTests
             {
                 hserver.SetUpPostExpectation("http://localhost:50000/user/23")
                     .ExpectedNumberOfCalls(1)
-                    .ExpectedContent(new { Name = "test", Id = 23 }, HttpRequestContentType.Json)
+                    .ExpectedContent(new { Name = "test", Id = 23 }, RequestContentType.Json)
                     .ExpectedRequestHeader("test", "test1")
-                    .Response(HttpStatusCode.OK, HttpRequestContentType.Json, new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
+                    .Response(HttpStatusCode.OK, RequestContentType.Json, new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23 });
                 request.AddHeader("test", "test1");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -140,7 +141,7 @@ namespace HttpServerMockTests
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.NotModified, response.StatusCode, "The respond status code is not the expected.");
@@ -163,13 +164,13 @@ namespace HttpServerMockTests
                         {
                             return req.RequestUri.PathAndQuery == "/user/23";
                         })
-                    .Response(HttpStatusCode.OK, HttpRequestContentType.Json, new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
+                    .Response(HttpStatusCode.OK, RequestContentType.Json, new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23 });
                 request.AddHeader("test", "test1");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -199,7 +200,7 @@ namespace HttpServerMockTests
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23 });
                 request.AddHeader("test", "test1");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -223,7 +224,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23") { Method = Method.POST };
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.POST };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -247,7 +248,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23") { Method = Method.POST };
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.POST };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -278,7 +279,7 @@ namespace HttpServerMockTests
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("test", "value");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -298,7 +299,7 @@ namespace HttpServerMockTests
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("test", "value");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -318,7 +319,7 @@ namespace HttpServerMockTests
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("Content-Type", "application/text");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -339,7 +340,7 @@ namespace HttpServerMockTests
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -359,7 +360,7 @@ namespace HttpServerMockTests
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("test", "test1");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -381,7 +382,7 @@ namespace HttpServerMockTests
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("expectedHeader", "test");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -403,7 +404,7 @@ namespace HttpServerMockTests
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("expectedHeader", "headervalue");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -425,7 +426,7 @@ namespace HttpServerMockTests
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("expectedheader", "HeaderValue");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -443,13 +444,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-                    .ExpectedContent(new { Name = "test", Id = 23 }, HttpRequestContentType.Json)
+                    .ExpectedContent(new { Name = "test", Id = 23 }, RequestContentType.Json)
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -464,13 +465,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-                    .ExpectedContent(new { Name = "TesT", Id = 23, IsOld = true }, HttpRequestContentType.Json)
+                    .ExpectedContent(new { Name = "TesT", Id = 23, IsOld = true }, RequestContentType.Json)
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -485,13 +486,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-                    .ExpectedContent(new { Name = "test", IsOld = true, Id = 23 }, HttpRequestContentType.Json)
+                    .ExpectedContent(new { Name = "test", IsOld = true, Id = 23 }, RequestContentType.Json)
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -506,13 +507,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-                    .ExpectedContent("{\"Name\":\"test\", \"IsOld\":true, \"Id\":23}", HttpRequestContentType.Json)
+                    .ExpectedContent("{\"Name\":\"test\", \"IsOld\":true, \"Id\":23}", RequestContentType.Json)
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -527,13 +528,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("user/23")
-                    .ExpectedContent("<User><Name>test</Name><IsOld>true</IsOld><Age>23</Age></User>", HttpRequestContentType.Xml)
-                    .Response(HttpStatusCode.OK, HttpRequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
+                    .ExpectedContent("<User><Name>test</Name><IsOld>true</IsOld><Age>23</Age></User>", RequestContentType.Xml)
+                    .Response(HttpStatusCode.OK, RequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -551,13 +552,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("user/23")
-                    .ExpectedContent(new { Name = "test", IsOld = true, Age = 23 }, HttpRequestContentType.Xml)
-                    .Response(HttpStatusCode.OK, HttpRequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
+                    .ExpectedContent(new { Name = "test", IsOld = true, Age = 23 }, RequestContentType.Xml)
+                    .Response(HttpStatusCode.OK, RequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -575,13 +576,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("user/23")
-                    .ExpectedContent(new ResponseTestClass() { Name = "test", IsOld = true, Age = 23 }, HttpRequestContentType.Xml)
-                    .Response(HttpStatusCode.OK, HttpRequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
+                    .ExpectedContent(new ResponseTestClass() { Name = "test", IsOld = true, Age = 23 }, RequestContentType.Xml)
+                    .Response(HttpStatusCode.OK, RequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -625,13 +626,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("user/23")
-                    .ExpectedContent((object)null, HttpRequestContentType.None)
+                    .ExpectedContent((object)null, RequestContentType.None)
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("Content-Type", "application/text");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -646,13 +647,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("user/23")
-                    .ExpectedContent((object)null, HttpRequestContentType.Json)
+                    .ExpectedContent((object)null, RequestContentType.Json)
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("Content-Type", "application/json");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -667,13 +668,13 @@ namespace HttpServerMockTests
             using (var hserver = new HttpServerMock(TestServerPort))
             {
                 hserver.SetUpPostExpectation("user/23")
-                    .ExpectedContent((object)null, HttpRequestContentType.Json)
+                    .ExpectedContent((object)null, RequestContentType.Json)
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddHeader("Content-Type", "application/text");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -693,7 +694,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23") { Method = Method.POST };
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.POST };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -713,7 +714,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23/data") { Method = Method.GET };
+                var request = new RestRequest("/user/23/data") { Method = RestSharp.Method.GET };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -731,7 +732,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23/data") { Method = Method.GET };
+                var request = new RestRequest("/user/23/data") { Method = RestSharp.Method.GET };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -749,7 +750,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23/data?name=paco") { Method = Method.GET };
+                var request = new RestRequest("/user/23/data?name=paco") { Method = RestSharp.Method.GET };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -769,7 +770,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23") { Method = Method.GET };
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.GET };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -787,7 +788,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23") { Method = Method.GET };
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.GET };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -805,7 +806,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23") { Method = Method.GET };
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.GET };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -823,7 +824,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/age?q=%3E23") { Method = Method.GET };
+                var request = new RestRequest("/user/age?q=%3E23") { Method = RestSharp.Method.GET };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -841,7 +842,7 @@ namespace HttpServerMockTests
                     .Response(HttpStatusCode.OK);
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/age?q=>E23") { Method = Method.GET };
+                var request = new RestRequest("/user/age?q=>E23") { Method = RestSharp.Method.GET };
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
@@ -861,7 +862,7 @@ namespace HttpServerMockTests
                     .TimedOut();
 
                 var restClient = new RestClient(this.serverBaseUrl);
-                var request = new RestRequest("/user/23") { Method = Method.GET , Timeout = 100};
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.GET , Timeout = 100};
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(ResponseStatus.TimedOut, response.ResponseStatus, "The request does not timed out.");
@@ -878,21 +879,21 @@ namespace HttpServerMockTests
             {
                 hserver.SetUpPostExpectation("http://localhost:50000/user/23")
                     .ExpectedNumberOfCalls(1)
-                    .ExpectedContent(new { Name = "test", Id = 23 }, HttpRequestContentType.Json)
+                    .ExpectedContent(new { Name = "test", Id = 23 }, RequestContentType.Json)
                     .ExpectedRequestHeader("test", "test1")
-                    .Response(HttpStatusCode.OK, HttpRequestContentType.Json, new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
+                    .Response(HttpStatusCode.OK, RequestContentType.Json, new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
 
                 hserver.SetUpPostExpectation("http://localhost:50000/user/23")
                     .ExpectedNumberOfCalls(1)
-                    .ExpectedContent(new { Name = "test", Id = 23 }, HttpRequestContentType.Json)
+                    .ExpectedContent(new { Name = "test", Id = 23 }, RequestContentType.Json)
                     .ExpectedRequestHeader("test", "test1")
-                    .Response(HttpStatusCode.OK, HttpRequestContentType.Json, new ResponseTestClass { Name = "response2", IsOld = false, Age = 13 });
+                    .Response(HttpStatusCode.OK, RequestContentType.Json, new ResponseTestClass { Name = "response2", IsOld = false, Age = 13 });
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23 });
                 request.AddHeader("test", "test1");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -940,7 +941,7 @@ namespace HttpServerMockTests
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23 });
                 request.AddHeader("test", "test1");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -968,7 +969,7 @@ namespace HttpServerMockTests
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -989,7 +990,7 @@ namespace HttpServerMockTests
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -1010,7 +1011,7 @@ namespace HttpServerMockTests
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -1032,7 +1033,7 @@ namespace HttpServerMockTests
 
                 var restClient = new RestClient(this.serverBaseUrl);
                 var request = new RestRequest("/user/23");
-                request.Method = Method.GET;
+                request.Method = RestSharp.Method.GET;
 
                 var response = restClient.Execute(request);
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -1054,7 +1055,7 @@ namespace HttpServerMockTests
                 var request = new RestRequest("/user/23");
                 request.AddJsonBody(new { Name = "test", Id = 23 });
                 request.AddHeader("test", "test1");
-                request.Method = Method.POST;
+                request.Method = RestSharp.Method.POST;
 
                 var response = restClient.Execute<ResponseTestClass>(request);
                 Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");

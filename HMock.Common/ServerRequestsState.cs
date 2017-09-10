@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
+using HttpServerMock.Common.Model;
 
 namespace HttpServerMock.Common
 {
@@ -9,36 +10,27 @@ namespace HttpServerMock.Common
     /// </summary>
     public sealed class ServerRequestsState
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ServerRequestsState"/> class.
-        /// </summary>
-        public ServerRequestsState()
-        {
-            this.RequestExpectations = new Collection<RequestExpectation>();
-            ////this.RequestBehaviors = new Collection<RequestBehavior>();
-            this.UnexpectedRequests = new Collection<UnexpectedRequest>();
-            this.DefaultRespondStatusCode = HttpStatusCode.NotImplemented;
-        }
+        private readonly List<IRequestExpectation> requestExpectations = new List<IRequestExpectation>();
 
         /// <summary>
         /// Gets the request expectations configured for the Http server mock.
         /// </summary>
-        public ICollection<RequestExpectation> RequestExpectations { get; private set; }
-
-        /////// <summary>
-        /////// Gets the request behaviors configured for the Http server mock.
-        /////// </summary>
-        ////public ICollection<RequestBehavior> RequestBehaviors { get; private set; }
+        public IReadOnlyCollection<IRequestExpectation> RequestExpectations => this.requestExpectations;
 
         /// <summary>
         /// Gets the unexpected requests which were managed by the Http server mock.
         /// </summary>
-        public ICollection<UnexpectedRequest> UnexpectedRequests { get; private set; }
+        public ICollection<Request> UnexpectedRequests { get; } = new List<Request>();
 
         /// <summary>
         /// Gets or sets the respond status code which will be returned by the server for those
         /// request which has not any expectation or behavior.
         /// </summary>
-        public HttpStatusCode DefaultRespondStatusCode { get; set; }
+        public StatusCode DefaultRespondStatusCode { get; } = StatusCode.NotImplemented;
+
+        public void AddExpectaction(IRequestExpectation expectation)
+        {
+            this.requestExpectations.Add(expectation);
+        }
     }
 }

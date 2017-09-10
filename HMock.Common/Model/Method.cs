@@ -1,9 +1,9 @@
-﻿namespace HttpServerMock.Common
+﻿namespace HttpServerMock.Common.Model
 {
     /// <summary>
     /// Available HTTP request methods.
     /// </summary>
-    public enum HttpMethod
+    public enum Method
     {
         /// <summary>
         /// HTTP get method.

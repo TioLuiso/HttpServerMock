@@ -1,4 +1,5 @@
 ﻿using HttpServerMock.Common;
+using HttpServerMock.Common.Model;
 
 namespace HttpServerMock.ExtensionMethods
 {
@@ -10,7 +11,7 @@ namespace HttpServerMock.ExtensionMethods
     using System.Globalization;
     using System.Linq;
     using System.Net.Http;
-    using HttpMethod = global::HttpServerMock.Common.HttpMethod;
+    using Method = global::HttpServerMock.Common.Model.Method;
 
     /// <summary>
     /// Extension methods for HttpServerMock class.
@@ -31,13 +32,13 @@ namespace HttpServerMock.ExtensionMethods
         /// <param name="expectedRequestHeaders">The expected request headers.</param>
         /// <param name="requestValidator">The request validator.</param>
         /// <returns></returns>
-        public static RequestExpectation SetUpExpectation<T>(
+        public static IRequestExpectation SetUpExpectation<T>(
             this HttpServerMock serverMock,
-            HttpMethod method,
+            Method method,
             string requetsUri,
             uint times = 1,
             string name = "",
-            HttpRequestContentType expectedContentType = HttpRequestContentType.None,
+            string expectedContentType = "None",
             T expectedRequestContent = null,
             IDictionary<string, string> expectedRequestHeaders = null,
             Func<HttpRequestMessage, bool> requestValidator = null) where T : class
@@ -63,9 +64,9 @@ namespace HttpServerMock.ExtensionMethods
         /// <param name="name">The name.</param>
         /// <param name="times">The times.</param>
         /// <returns></returns>
-        public static RequestExpectation SetUpExpectation(
+        public static IRequestExpectation SetUpExpectation(
             this HttpServerMock serverMock,
-            HttpMethod method,
+            Method method,
             string requetsUri,
             string name = "",
             uint times = 1)
@@ -76,7 +77,7 @@ namespace HttpServerMock.ExtensionMethods
                 requetsUri,
                 name,
                 times,
-                HttpRequestContentType.None,
+                "None",
                 null,
                 null,
                 null);
@@ -95,19 +96,19 @@ namespace HttpServerMock.ExtensionMethods
         /// <param name="expectedRequestHeaders">The expected request headers.</param>
         /// <param name="requestValidator">The request validator.</param>
         /// <returns></returns>
-        public static RequestExpectation SetUpGetExpectation<T>(
+        public static IRequestExpectation SetUpGetExpectation<T>(
             this HttpServerMock serverMock,
             string requetsUri,
             uint times = 1,
             string name = "",
-            HttpRequestContentType expectedContentType = HttpRequestContentType.None,
+            string expectedContentType = "None",
             T expectedRequestContent = null,
             IDictionary<string, string> expectedRequestHeaders = null,
             Func<HttpRequestMessage, bool> requestValidator = null) where T : class
         {
             return CreateHttpServerExpectation(
                 serverMock,
-                HttpMethod.GET,
+                Method.GET,
                 requetsUri,
                 name,
                 times,
@@ -133,11 +134,11 @@ namespace HttpServerMock.ExtensionMethods
         {
             return CreateHttpServerExpectation(
                 serverMock,
-                HttpMethod.GET,
+                Method.GET,
                 requetsUri,
                 name,
                 times,
-                HttpRequestContentType.None,
+                RequestContentType.None,
                 null,
                 null,
                 null);
@@ -161,14 +162,14 @@ namespace HttpServerMock.ExtensionMethods
             string requetsUri,
             uint times = 1,
             string name = "",
-            HttpRequestContentType expectedContentType = HttpRequestContentType.None,
+            RequestContentType expectedContentType = RequestContentType.None,
             T expectedRequestContent = null,
             IDictionary<string, string> expectedRequestHeaders = null,
             Func<HttpRequestMessage, bool> requestValidator = null) where T : class
         {
             return CreateHttpServerExpectation(
                 serverMock,
-                HttpMethod.POST,
+                Method.POST,
                 requetsUri,
                 name,
                 times,
@@ -194,11 +195,11 @@ namespace HttpServerMock.ExtensionMethods
         {
             return CreateHttpServerExpectation(
                 serverMock,
-                HttpMethod.POST,
+                Method.POST,
                 requetsUri,
                 name,
                 times,
-                HttpRequestContentType.None,
+                RequestContentType.None,
                 null,
                 null,
                 null);
@@ -294,35 +295,28 @@ namespace HttpServerMock.ExtensionMethods
         }
 
         #region Private Methods
-        private static RequestExpectation CreateHttpServerExpectation(HttpServerMock serverMock,
-            HttpMethod requestMethod,
+        private static IRequestExpectation CreateHttpServerExpectation(HttpServerMock serverMock,
+            Method requestMethod,
             string requetsUri,
             string name,
-            uint times,
-            HttpRequestContentType expectedContentType,
-            object expectedRequestContent,
+            int times,
+            string expectedContentType,
+            IContent expectedRequestContent,
             IDictionary<string, string> expectedRequestHeaders,
-            Func<HttpRequestMessage, bool> requestValidator)
+            Func<Request, bool> requestValidator)
         {
-            var expectation = new RequestExpectation(requetsUri)
-            {
-                RequestHttpMethod = requestMethod,
-                ExpectedRequestContent = expectedRequestContent,
-                ExpectedRequestContentType = Helper.ParseRequestContentType(expectedContentType),
-                Repeats = times,
-                RequestValidator = requestValidator,
-                Name = name
-            };
+            var expectation = new RequestExpectationBuilder()
+                .WithName(name)
+                .WithUri(requetsUri)
+                .WithMethod(requestMethod)
+                .WithNumberOfCalls(times)
+                .WithContentType(expectedContentType)
+                .WithContent(expectedRequestContent)
+                .WithValidator(requestValidator)
+                .WithHeaders(expectedRequestHeaders)
+                .Build();
 
-            if (expectedRequestHeaders != null)
-            {
-                foreach (var expectedRequestHeader in expectedRequestHeaders)
-                {
-                    expectation.ExpectedRequestHeaders.Add(expectedRequestHeader.Key, expectedRequestHeader.Value);
-                }
-            }
-
-            serverMock.ServerRequestsState.RequestExpectations.Add(expectation);
+            serverMock.ServerRequestsState.AddExpectaction(expectation);
 
             return expectation;
         }

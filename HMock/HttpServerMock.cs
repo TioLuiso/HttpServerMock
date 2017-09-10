@@ -1,5 +1,5 @@
 ﻿using HttpServerMock.Common;
-using HttpServerMock.Common.Internals;
+using Microsoft.Owin.Hosting;
 
 namespace HttpServerMock
 {
@@ -8,16 +8,13 @@ namespace HttpServerMock
     using System.Net;
     using System.Web.Http.SelfHost;
 
-    using global::HttpServerMock.Internals;
-
     /// <summary>
     /// HTTP server mock class.
     /// </summary>
     public sealed class HttpServerMock : IDisposable
     {
-        private HttpSelfHostServer httpServer;
-
         private bool isDisposed;
+        private IDisposable webapp;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpServerMock"/> class.
@@ -54,39 +51,23 @@ namespace HttpServerMock
         {
             if (!this.isDisposed)
             {
-                this.Stop();
-                this.httpServer.Dispose();
+                this.webapp.Dispose();
                 this.isDisposed = true;
             }
-        }
-
-        /// <summary>
-        /// Starts the HTTP server mock.
-        /// </summary>
-        public void Start()
-        {
-            this.httpServer.OpenAsync().Wait();
-        }
-
-        /// <summary>
-        /// Stops this HTTP server mock.
-        /// </summary>
-        public void Stop()
-        {
-            this.httpServer.CloseAsync().Wait();
         }
 
         private void StartServer()
         {
             string baseAddress = string.Format(CultureInfo.InvariantCulture, "http://{0}:{1}", this.IpOrDns, this.Port);
-            var config = new HttpSelfHostConfiguration(baseAddress);
 
-            // It adds any route.
-            config.Routes.Add("~", new HHttpRoute(this.ServerRequestsState));
-            this.httpServer = new HttpSelfHostServer(config);
+            var options = new StartOptions(baseAddress);
+            var requestMapper = new RequestMapper();
+            var requestProcessor = new RequestProcessor(this.ServerRequestsState);
+            var responseMapper = new ResponseMapper();
+            var mockProcessor = new MockProcessor(null, requestMapper, responseMapper, requestProcessor);
+            var startup = new Startup(mockProcessor);
 
-            this.httpServer.InnerHandler = new HHttpMessageHandler(this.ServerRequestsState);
-            this.Start();
+            this.webapp = WebApp.Start(options, builder => startup.Configuration(builder));
         }
     }
 }

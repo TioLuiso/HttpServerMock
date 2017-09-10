@@ -1,9 +1,9 @@
-﻿namespace HttpServerMock.Common
+﻿namespace HttpServerMock.Common.Model
 {
     /// <summary>
     /// Available request content types.
     /// </summary>
-    public enum HttpRequestContentType
+    public enum RequestContentType
     {
         /// <summary>
         /// Undefined content type.
