@@ -13,7 +13,7 @@
         /// <summary>
         /// XML content type.
         /// </summary>
-        public static string Xml = "application/xml";
+        public static string Xml = "text/xml";
 
         /////// <summary>
         /////// The text

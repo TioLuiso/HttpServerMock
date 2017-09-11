@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml.Linq;
 using HttpServerMock.Common.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -114,6 +117,27 @@ namespace HttpServerMock.Common
         {
             JToken tokenContent = JToken.FromObject(content);
             this.content = new JsonContent(tokenContent);
+            return this;
+        }
+
+        public IRequestExpectationBuilder WithXmlContent(string content)
+        {
+            this.content = new XmlContent(XElement.Parse(content));
+            return this;
+        }
+
+        public IRequestExpectationBuilder WithXmlContent(XElement content)
+        {
+            this.content = new XmlContent(content);
+            return this;
+        }
+
+        public IRequestExpectationBuilder WithXmlContent<T>(T content)
+        {
+            var jobject = JObject.FromObject(content);
+            var container = new JObject(new JProperty(typeof(T).Name, jobject));
+            var stringRepresentation = JsonConvert.SerializeObject(container);
+            this.content = new XmlContent(JsonConvert.DeserializeXNode(stringRepresentation).Root);
             return this;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using HttpServerMock.Common.Model;
 using Newtonsoft.Json.Linq;
 
@@ -19,6 +20,9 @@ namespace HttpServerMock.Common
         IExpectationResponseBuilder WithJsonContent(string content);
         IExpectationResponseBuilder WithJsonContent(JToken content);
         IExpectationResponseBuilder WithJsonContent<T>(T content);
+        IExpectationResponseBuilder WithXmlContent(string content);
+        IExpectationResponseBuilder WithXmlContent(XElement content);
+        IExpectationResponseBuilder WithXmlContent<T>(T content);
         IExpectationResponseBuilder WithResponseTime(int milliseconds);
         Task<Response> BuildAsync(Request request);
     }

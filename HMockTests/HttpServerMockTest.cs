@@ -1,8 +1,6 @@
 ﻿using HttpServerMock.Common;
 using HttpServerMock.Common.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace HttpServerMockTests
 {
@@ -14,11 +12,7 @@ namespace HttpServerMockTests
 
     using RestSharp;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-
     using Method = Method;
 
     [TestClass]
@@ -480,7 +474,7 @@ namespace HttpServerMockTests
                 hserver.SetupExpectation(new RequestExpectationBuilder()
                     .WithMethod(Method.POST)
                     .WithUri("http://localhost:50000/user/23")
-                    .WithHeader("expectedHeader", "headerValue")
+                    .WithHeader("expectedHeader", "HeaderValue")
                     .WithResponseBuilder(new ExpectationResponseBuilder()
                         .WithStatusCode(StatusCode.OK))
                     .Build());
@@ -498,7 +492,7 @@ namespace HttpServerMockTests
         }
         #endregion
 
-        //#region Request Content Validation
+        #region Request Content Validation
         [TestMethod]
         [TestCategory("ThreadNotSafe")]
         public void HHttpServer_JsonRequestContentMorePropertiesThanExpected_NotImplementedRespondHttpStatus()
@@ -603,20 +597,113 @@ namespace HttpServerMockTests
             }
         }
 
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_XmlStringContent_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithContentType(ContentTypes.Xml)
+                    .WithXmlContent("<ResponseTestClass><Name>test</Name><IsOld>true</IsOld><Age>23</Age></ResponseTestClass>")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK)
+                        .WithContentType(ContentTypes.Xml)
+                        .WithXmlContent(new { Name = "testres", Age = 25, IsOld = false }))
+                    .Build());
+
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
+                request.Method = RestSharp.Method.POST;
+
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+                Assert.AreEqual("testres", response.Data.Name, "The data returned by the server is not the expected.");
+                Assert.AreEqual(false, response.Data.IsOld, "The data returned by the server is not the expected.");
+                Assert.AreEqual(25, response.Data.Age, "The data returned by the server is not the expected.");
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_XmlContentDynamic_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithContentType(ContentTypes.Xml)
+                    .WithXmlContent(new { Name = "test", IsOld = true, Age = 23 })
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK)
+                        .WithContentType("application/xml;charset=utf-8")
+                        .WithXmlContent(new { Name = "testres", Age = 25, IsOld = false }))
+                    .Build());
+
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
+                request.Method = RestSharp.Method.POST;
+
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+                Assert.AreEqual("testres", response.Data.Name, "The data returned by the server is not the expected.");
+                Assert.AreEqual(false, response.Data.IsOld, "The data returned by the server is not the expected.");
+                Assert.AreEqual(25, response.Data.Age, "The data returned by the server is not the expected.");
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_XmlContentTyped_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithContentType(ContentTypes.Xml)
+                    .WithXmlContent(new ResponseTestClass() { Name = "test", IsOld = true, Age = 23 })
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK)
+                        .WithContentType("application/xml;charset=utf-8")
+                        .WithXmlContent(new { Name = "testres", Age = 25, IsOld = false }))
+                    .Build());
+
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
+                request.Method = RestSharp.Method.POST;
+
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+                Assert.AreEqual("testres", response.Data.Name, "The data returned by the server is not the expected.");
+                Assert.AreEqual(false, response.Data.IsOld, "The data returned by the server is not the expected.");
+                Assert.AreEqual(25, response.Data.Age, "The data returned by the server is not the expected.");
+            }
+        }
+
         //[TestMethod]
         //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_XmlStringContent_Ok()
+        //public void HHttpServer_FormUrlEncodedContentTyped_Ok()
         //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
+        //    using (var hserver = new HHttpServer(TestServerPort))
         //    {
         //        hserver.SetUpPostExpectation("user/23")
-        //            .ExpectedContent("<User><Name>test</Name><IsOld>true</IsOld><Age>23</Age></User>", RequestContentType.Xml)
-        //            .Response(HttpStatusCode.OK, RequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
+        //            .ExpectedContent(new ResponseTestClass() { Name = "test", IsOld = true, Age = 23 }, HContentType.FormUrlEncoded)
+        //            .Response(HttpStatusCode.OK, HContentType.FormUrlEncoded, new { Name = "testres", Age = 25, IsOld = false });
 
         //        var restClient = new RestClient(this.serverBaseUrl);
         //        var request = new RestRequest("/user/23");
-        //        request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
-        //        request.Method = RestSharp.Method.POST;
+        //        request.AddObject(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
+        //        request.Method = Method.POST;
 
         //        var response = restClient.Execute<ResponseTestClass>(request);
         //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
@@ -626,79 +713,7 @@ namespace HttpServerMockTests
         //        Assert.AreEqual(25, response.Data.Age, "The data returned by the server is not the expected.");
         //    }
         //}
-
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_XmlContentDynamic_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("user/23")
-        //            .ExpectedContent(new { Name = "test", IsOld = true, Age = 23 }, RequestContentType.Xml)
-        //            .Response(HttpStatusCode.OK, RequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
-
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
-        //        request.Method = RestSharp.Method.POST;
-
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //        Assert.AreEqual("testres", response.Data.Name, "The data returned by the server is not the expected.");
-        //        Assert.AreEqual(false, response.Data.IsOld, "The data returned by the server is not the expected.");
-        //        Assert.AreEqual(25, response.Data.Age, "The data returned by the server is not the expected.");
-        //    }
-        //}
-
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_XmlContentTyped_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("user/23")
-        //            .ExpectedContent(new ResponseTestClass() { Name = "test", IsOld = true, Age = 23 }, RequestContentType.Xml)
-        //            .Response(HttpStatusCode.OK, RequestContentType.Xml, new { Name = "testres", Age = 25, IsOld = false });
-
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddXmlBody(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
-        //        request.Method = RestSharp.Method.POST;
-
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //        Assert.AreEqual("testres", response.Data.Name, "The data returned by the server is not the expected.");
-        //        Assert.AreEqual(false, response.Data.IsOld, "The data returned by the server is not the expected.");
-        //        Assert.AreEqual(25, response.Data.Age, "The data returned by the server is not the expected.");
-        //    }
-        //}
-
-        //////[TestMethod]
-        //////[TestCategory("ThreadNotSafe")]
-        //////public void HHttpServer_FormUrlEncodedContentTyped_Ok()
-        //////{
-        //////    using (var hserver = new HHttpServer(TestServerPort))
-        //////    {
-        //////        hserver.SetUpPostExpectation("user/23")
-        //////            .ExpectedContent(new ResponseTestClass() { Name = "test", IsOld = true, Age = 23 }, HContentType.FormUrlEncoded)
-        //////            .Response(HttpStatusCode.OK, HContentType.FormUrlEncoded, new { Name = "testres", Age = 25, IsOld = false });
-
-        //////        var restClient = new RestClient(this.serverBaseUrl);
-        //////        var request = new RestRequest("/user/23");
-        //////        request.AddObject(new ResponseTestClass() { Name = "test", Age = 23, IsOld = true });
-        //////        request.Method = Method.POST;
-
-        //////        var response = restClient.Execute<ResponseTestClass>(request);
-        //////        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //////        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //////        Assert.AreEqual("testres", response.Data.Name, "The data returned by the server is not the expected.");
-        //////        Assert.AreEqual(false, response.Data.IsOld, "The data returned by the server is not the expected.");
-        //////        Assert.AreEqual(25, response.Data.Age, "The data returned by the server is not the expected.");
-        //////    }
-        //////}
-        //#endregion
+        #endregion
 
         //#region Request Content Type Validation
         //[TestMethod]

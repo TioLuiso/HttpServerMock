@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using HttpServerMock.Common.Model;
 using Newtonsoft.Json.Linq;
 
@@ -22,6 +23,9 @@ namespace HttpServerMock.Common
         IRequestExpectationBuilder WithJsonContent(string content);
         IRequestExpectationBuilder WithJsonContent(JToken content);
         IRequestExpectationBuilder WithJsonContent<T>(T content);
+        IRequestExpectationBuilder WithXmlContent(string content);
+        IRequestExpectationBuilder WithXmlContent(XElement content);
+        IRequestExpectationBuilder WithXmlContent<T>(T content);
         IRequestExpectationBuilder WithNumberOfCalls(int numberOfCalls);
         IRequestExpectationBuilder WithResponseBuilder(IExpectationResponseBuilder responseBuilder);
         IRequestExpectationBuilder WithValidator(Func<Request, bool> requestValidator);

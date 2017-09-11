@@ -71,7 +71,7 @@ namespace HttpServerMock.Common
                     {
                         requestHeader = requestHeader.SelectMany(h => h.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries));
                         var expectedHeader = this.RequestHeaders[expectedHeaderKey];
-                        if (expectedHeader.Except(requestHeader, StringComparer.OrdinalIgnoreCase).Any())
+                        if (expectedHeader.Except(requestHeader).Any())
                         {
                             return false;
                         }

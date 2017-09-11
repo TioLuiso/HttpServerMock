@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using HttpServerMock.Common;
+﻿using HttpServerMock.Common;
 using HttpServerMock.Common.Model;
 using Microsoft.Owin;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace HttpServerMock
 {
@@ -44,7 +45,7 @@ namespace HttpServerMock
                 }
                 else if(Helper.IsXmlRequest(contentType))
                 {
-                    return new StringContent(Encoding.UTF8.GetString(binaryContent));
+                    return new XmlContent(XElement.Parse(Encoding.UTF8.GetString(binaryContent)));
                 }
 
                 return new BinaryContent(binaryContent);
