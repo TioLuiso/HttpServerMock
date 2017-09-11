@@ -110,6 +110,13 @@ namespace HttpServerMock.Common
             return this;
         }
 
+        public IRequestExpectationBuilder WithJsonContent<T>(T content)
+        {
+            JToken tokenContent = JToken.FromObject(content);
+            this.content = new JsonContent(tokenContent);
+            return this;
+        }
+
         public IRequestExpectationBuilder WithNumberOfCalls(int numberOfCalls)
         {
             this.numberOfCalls = numberOfCalls;

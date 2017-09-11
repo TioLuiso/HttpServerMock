@@ -243,7 +243,7 @@ namespace HttpServerMock.ExtensionMethods
                             Headers = serializedHeaders,
                             Method = expect.Method.ToString(),
                             Content = requestContent,
-                            ContentType = expect.ContentType.ToString(),
+                            ContentType = expect.ContentType?.ToString(),
                             ExpectedNumberOfCalls = expect.ExpectedNumberOfCalls,
                             ActualNumberOfCalls = expect.ActualNumberOfCalls
                         };

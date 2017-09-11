@@ -24,7 +24,7 @@ namespace HttpServerMock
 
         private void mapContent(Response response, IOwinResponse contextResponse)
         {
-            response.Content.Write(contextResponse.Body);
+            response.Content?.Write(contextResponse.Body);
         }
 
         private void MapHeaders(Response response, IHeaderDictionary responseHeaders)

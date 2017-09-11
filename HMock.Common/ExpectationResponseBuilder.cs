@@ -91,6 +91,13 @@ namespace HttpServerMock.Common
             return this;
         }
 
+        public IExpectationResponseBuilder WithJsonContent<T>(T content)
+        {
+            JToken tokenContent = JToken.FromObject(content);
+            this.content = new JsonContent(tokenContent);
+            return this;
+        }
+
         public IExpectationResponseBuilder WithResponseTime(int milliseconds)
         {
             this.responseTime = milliseconds;

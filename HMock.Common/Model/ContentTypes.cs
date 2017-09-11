@@ -3,27 +3,22 @@
     /// <summary>
     /// Available request content types.
     /// </summary>
-    public enum RequestContentType
+    public static class ContentTypes
     {
-        /// <summary>
-        /// Undefined content type.
-        /// </summary>
-        None = 0,
-
         /// <summary>
         /// Json content type.
         /// </summary>
-        Json = 1,
+        public static string Json = "application/json";
 
         /// <summary>
         /// XML content type.
         /// </summary>
-        Xml = 2,
+        public static string Xml = "application/xml";
 
         /////// <summary>
         /////// The text
         /////// </summary>
-        ////Text = 3,
+        public static string Text = "text/plain";
 
         /////// <summary>
         /////// The form URL encoded

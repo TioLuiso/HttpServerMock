@@ -21,6 +21,7 @@ namespace HttpServerMock.Common
         IRequestExpectationBuilder WithBinaryContent(byte[] content);
         IRequestExpectationBuilder WithJsonContent(string content);
         IRequestExpectationBuilder WithJsonContent(JToken content);
+        IRequestExpectationBuilder WithJsonContent<T>(T content);
         IRequestExpectationBuilder WithNumberOfCalls(int numberOfCalls);
         IRequestExpectationBuilder WithResponseBuilder(IExpectationResponseBuilder responseBuilder);
         IRequestExpectationBuilder WithValidator(Func<Request, bool> requestValidator);

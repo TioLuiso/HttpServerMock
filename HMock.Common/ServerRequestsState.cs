@@ -26,7 +26,7 @@ namespace HttpServerMock.Common
         /// Gets or sets the respond status code which will be returned by the server for those
         /// request which has not any expectation or behavior.
         /// </summary>
-        public StatusCode DefaultRespondStatusCode { get; } = StatusCode.NotImplemented;
+        public StatusCode DefaultRespondStatusCode { get; set; } = StatusCode.NotImplemented;
 
         public void AddExpectaction(IRequestExpectation expectation)
         {

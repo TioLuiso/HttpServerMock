@@ -18,6 +18,7 @@ namespace HttpServerMock.Common
         IExpectationResponseBuilder WithBinaryContent(byte[] content);
         IExpectationResponseBuilder WithJsonContent(string content);
         IExpectationResponseBuilder WithJsonContent(JToken content);
+        IExpectationResponseBuilder WithJsonContent<T>(T content);
         IExpectationResponseBuilder WithResponseTime(int milliseconds);
         Task<Response> BuildAsync(Request request);
     }

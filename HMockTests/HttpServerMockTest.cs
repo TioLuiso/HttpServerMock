@@ -48,8 +48,8 @@ namespace HttpServerMockTests
                     .WithHeader("test", "test1")
                     .WithResponseBuilder(new ExpectationResponseBuilder()
                         .WithStatusCode(StatusCode.OK)
-                        .WithContentType(Helper.JsonContentTypes.First())
-                        .WithJsonContent(JToken.FromObject(new ResponseTestClass { Name = "response", IsOld = true, Age = 12 })))
+                        .WithContentType(ContentTypes.Json)
+                        .WithJsonContent(new ResponseTestClass { Name = "response", IsOld = true, Age = 12 }))
                     .Build());
 
                 var restClient = new RestClient(this.serverBaseUrl);
@@ -70,460 +70,538 @@ namespace HttpServerMockTests
             }
         }
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_GetRequest_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpGetExpectation("http://localhost:50000/user/23")
-        //            .ExpectedNumberOfCalls(1)
-        //            .ExpectedRequestHeader("test", "test1")
-        //            .Response(
-        //                HttpStatusCode.OK,
-        //                RequestContentType.Json,
-        //                new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_GetRequest_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.GET)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("test", "test1")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK)
+                        .WithContentType(ContentTypes.Json)
+                        .WithJsonContent(new ResponseTestClass { Name = "response", IsOld = true, Age = 12 }))
+                    .Build());
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddJsonBody(new { Name = "test", Id = 23 });
-        //        request.AddHeader("test", "test1");
-        //        request.Method = RestSharp.Method.GET;
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddJsonBody(new { Name = "test", Id = 23 });
+                request.AddHeader("test", "test1");
+                request.Method = RestSharp.Method.GET;
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNotNull(response.Data, "The response is empty.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //        Assert.AreEqual("response", response.Data.Name, "The response data is not the expected.");
-        //        Assert.IsTrue(response.Data.IsOld, "The response data is not the expected.");
-        //        Assert.AreEqual(12, response.Data.Age, "The response data is not the expected.");
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNotNull(response.Data, "The response is empty.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+                Assert.AreEqual("response", response.Data.Name, "The response data is not the expected.");
+                Assert.IsTrue(response.Data.IsOld, "The response data is not the expected.");
+                Assert.AreEqual(12, response.Data.Age, "The response data is not the expected.");
 
-        //        hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
-        //    }
-        //}
+                hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
+            }
+        }
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_PostRequest_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedNumberOfCalls(1)
-        //            .ExpectedContent(new { Name = "test", Id = 23 }, RequestContentType.Json)
-        //            .ExpectedRequestHeader("test", "test1")
-        //            .Response(HttpStatusCode.OK, RequestContentType.Json, new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_PostRequest_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithJsonContent(new { Name = "test", Id = 23 })
+                    .WithContentType(ContentTypes.Json)
+                    .WithHeader("test", "test1")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK)
+                        .WithContentType(ContentTypes.Json)
+                        .WithJsonContent(new ResponseTestClass { Name = "response", IsOld = true, Age = 12 }))
+                    .Build());
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddJsonBody(new { Name = "test", Id = 23 });
-        //        request.AddHeader("test", "test1");
-        //        request.Method = RestSharp.Method.POST;
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddJsonBody(new { Name = "test", Id = 23 });
+                request.AddHeader("test", "test1");
+                request.Method = RestSharp.Method.POST;
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNotNull(response.Data, "The response is empty.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //        Assert.AreEqual("response", response.Data.Name, "The response data is not the expected.");
-        //        Assert.IsTrue(response.Data.IsOld, "The response data is not the expected.");
-        //        Assert.AreEqual(12, response.Data.Age, "The response data is not the expected.");
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNotNull(response.Data, "The response is empty.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+                Assert.AreEqual("response", response.Data.Name, "The response data is not the expected.");
+                Assert.IsTrue(response.Data.IsOld, "The response data is not the expected.");
+                Assert.AreEqual(12, response.Data.Age, "The response data is not the expected.");
 
-        //        hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
-        //    }
-        //}
+                hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
+            }
+        }
 
         #endregion
 
-        //#region Default Status Code
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_ServerDefaultRespondStatusCode_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.ServerRequestsState.DefaultRespondStatusCode = HttpStatusCode.NotModified;
+        #region Default Status Code
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_ServerDefaultRespondStatusCode_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.ServerRequestsState.DefaultRespondStatusCode = StatusCode.NotModified;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.Method = RestSharp.Method.GET;
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.Method = RestSharp.Method.GET;
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.NotModified, response.StatusCode, "The respond status code is not the expected.");
-        //    }
-        //}
-        //#endregion
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.NotModified, response.StatusCode, "The respond status code is not the expected.");
+            }
+        }
+        #endregion
 
-        //#region Request Validator
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_RequestValidatorValidatesRequest_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpGetExpectation("http://localhost:50000/user/23")
-        //            .ExpectedNumberOfCalls(1)
-        //            .ExpectedRequestHeader("test", "test1")
-        //            .Validator(
-        //                req =>
-        //                {
-        //                    return req.RequestUri.PathAndQuery == "/user/23";
-        //                })
-        //            .Response(HttpStatusCode.OK, RequestContentType.Json, new ResponseTestClass { Name = "response", IsOld = true, Age = 12 });
+        #region Request Validator
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_RequestValidatorValidatesRequest_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.GET)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("test", "test1")
+                    .WithValidator(
+                        req =>
+                        {
+                            return req.Uri.PathAndQuery == "/user/23";
+                        })
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK)
+                        .WithContentType(ContentTypes.Json)
+                        .WithJsonContent(new ResponseTestClass { Name = "response", IsOld = true, Age = 12 }))
+                    .Build());
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddJsonBody(new { Name = "test", Id = 23 });
-        //        request.AddHeader("test", "test1");
-        //        request.Method = RestSharp.Method.GET;
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddJsonBody(new { Name = "test", Id = 23 });
+                request.AddHeader("test", "test1");
+                request.Method = RestSharp.Method.GET;
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNotNull(response.Data, "The response is empty.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //        Assert.AreEqual("response", response.Data.Name, "The response data is not the expected.");
-        //        Assert.IsTrue(response.Data.IsOld, "The response data is not the expected.");
-        //        Assert.AreEqual(12, response.Data.Age, "The response data is not the expected.");
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNotNull(response.Data, "The response is empty.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+                Assert.AreEqual("response", response.Data.Name, "The response data is not the expected.");
+                Assert.IsTrue(response.Data.IsOld, "The response data is not the expected.");
+                Assert.AreEqual(12, response.Data.Age, "The response data is not the expected.");
 
-        //        hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
-        //    }
-        //}
+                hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
+            }
+        }
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //[ExpectedException(typeof(HttpServerCallsVerificationException))]
-        //public void HHttpServer_RequestValidatorRefuseRequest_HttpServerCallsVerificationException()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpGetExpectation("http://localhost:50000/user/23")
-        //            .ExpectedNumberOfCalls(1)
-        //            .Validator(req => false);
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        [ExpectedException(typeof(HttpServerCallsVerificationException))]
+        public void HHttpServer_RequestValidatorRefuseRequest_HttpServerCallsVerificationException()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.GET)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("test", "test1")
+                    .WithValidator(req => false)
+                    .Build());
 
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddJsonBody(new { Name = "test", Id = 23 });
+                request.AddHeader("test", "test1");
+                request.Method = RestSharp.Method.GET;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddJsonBody(new { Name = "test", Id = 23 });
-        //        request.AddHeader("test", "test1");
-        //        request.Method = RestSharp.Method.GET;
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.Data, "The response is not empty.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.Data, "The response is not empty.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
+                hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
+            }
+        }
+        #endregion
 
-        //        hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
-        //    }
-        //}
-        //#endregion
+        #region Request Repeats
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_RepeatedRequests_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithNumberOfCalls(2)
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //#region Request Repeats
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_RepeatedRequests_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedNumberOfCalls(2)
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.POST };
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23") { Method = RestSharp.Method.POST };
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
 
-        //        response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
+            }
+        }
 
-        //        hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
-        //    }
-        //}
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        [ExpectedException(typeof(HttpServerCallsVerificationException))]
+        public void HHttpServer_RepeatedRequestsOneMore_NotImplementedRespondHttpStatus()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithNumberOfCalls(2)
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //[ExpectedException(typeof(HttpServerCallsVerificationException))]
-        //public void HHttpServer_RepeatedRequestsOneMore_NotImplementedRespondHttpStatus()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedNumberOfCalls(2)
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23") { Method = RestSharp.Method.POST };
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23") { Method = RestSharp.Method.POST };
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
 
-        //        response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
 
-        //        response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
+                hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
+            }
+        }
+        #endregion
 
-        //        hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
-        //    }
-        //}
-        //#endregion
+        #region Request Headers Validation
 
-        //#region Request Headers Validation
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_CustomHeadersExpected_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeaders(new Dictionary<string, IEnumerable<string>>{{"test", new []{ "value", "value2" }}, {"test2", new[]{"value3"}}})
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_CustomHeadersExpected_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedRequestHeaders(new Dictionary<string, string> { { "test", "value" } })
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddHeader("test", "value");
+                request.AddHeader("test", "value2");
+                request.AddHeader("test2", "value3");
+                request.AddHeader("test3", "value4");
+                request.Method = RestSharp.Method.POST;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddHeader("test", "value");
-        //        request.Method = RestSharp.Method.POST;
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+            }
+        }
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //    }
-        //}
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_CustomHeaderExpected_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("test", "value")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_CustomHeaderExpected_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedRequestHeader("test", "value")
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddHeader("test", "value");
+                request.Method = RestSharp.Method.POST;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddHeader("test", "value");
-        //        request.Method = RestSharp.Method.POST;
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+            }
+        }
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //    }
-        //}
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_RequestContentSpecialHeaderExpected_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("Content-Type", "application/text")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_RequestContentSpecialHeaderExpected_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedRequestHeader("Content-Type", "application/text")
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddHeader("Content-Type", "application/text");
+                request.Method = RestSharp.Method.POST;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddHeader("Content-Type", "application/text");
-        //        request.Method = RestSharp.Method.POST;
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
+            }
+        }
 
-        //        hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
-        //    }
-        //}
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_RequestSpecialHeaderExpected_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("Host", Dns.GetHostName().ToLower() + ":50000")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_RequestSpecialHeaderExpected_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedRequestHeader("Host", Dns.GetHostName().ToLower() + ":50000")
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.Method = RestSharp.Method.POST;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.Method = RestSharp.Method.POST;
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+            }
+        }
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //    }
-        //}
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_ExpectedHeaderNotPresent_NotImplementedRespondHttpStatus()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("expectedHeader", "headerValue")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_ExpectedHeaderNotPresent_NotImplementedRespondHttpStatus()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedRequestHeader("expectedHeader", "headerValue")
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddHeader("test", "test1");
+                request.Method = RestSharp.Method.POST;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddHeader("test", "test1");
-        //        request.Method = RestSharp.Method.POST;
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.Data, "The response is not empty.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+            }
+        }
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.Data, "The response is not empty.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //    }
-        //}
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_ExpectedHeaderPresentDifferentValue__NotImplementedRespondHttpStatus()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("expectedHeader", "headerValue")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_ExpectedHeaderPresentDifferentValue__NotImplementedRespondHttpStatus()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedRequestHeader("expectedHeader", "headerValue")
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddHeader("expectedHeader", "test");
+                request.Method = RestSharp.Method.POST;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddHeader("expectedHeader", "test");
-        //        request.Method = RestSharp.Method.POST;
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.Data, "The response is not empty.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+            }
+        }
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.Data, "The response is not empty.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //    }
-        //}
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_ExpectedHeaderPresentDifferentValueCase_NotImplementedRespondHttpStatus()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("expectedHeader", "headerValue")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_ExpectedHeaderPresentDifferentValueCase_NotImplementedRespondHttpStatus()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedRequestHeader("expectedHeader", "HeaderValue")
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddHeader("expectedHeader", "headervalue");
+                request.Method = RestSharp.Method.POST;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddHeader("expectedHeader", "headervalue");
-        //        request.Method = RestSharp.Method.POST;
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.Data, "The response is not empty.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+            }
+        }
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.Data, "The response is not empty.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //    }
-        //}
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_ExpectedHeaderPresentDifferentNameCase_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithHeader("expectedHeader", "headerValue")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_ExpectedHeaderPresentDifferentNameCase_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedRequestHeader("expectedHeader", "HeaderValue")
-        //            .Response(HttpStatusCode.OK);
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddHeader("expectedheader", "HeaderValue");
+                request.Method = RestSharp.Method.POST;
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddHeader("expectedheader", "HeaderValue");
-        //        request.Method = RestSharp.Method.POST;
+                var response = restClient.Execute<ResponseTestClass>(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
 
-        //        var response = restClient.Execute<ResponseTestClass>(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-
-        //        hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
-        //    }
-        //}
-        //#endregion
+                hserver.VerifyAllRequestExpectationsAndUnexpectedRequests();
+            }
+        }
+        #endregion
 
         //#region Request Content Validation
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_JsonRequestContentMorePropertiesThanExpected_NotImplementedRespondHttpStatus()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedContent(new { Name = "test", Id = 23 }, RequestContentType.Json)
-        //            .Response(HttpStatusCode.OK);
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_JsonRequestContentMorePropertiesThanExpected_NotImplementedRespondHttpStatus()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithContentType(ContentTypes.Json)
+                    .WithJsonContent(new { Name = "test", Id = 23 })
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
-        //        request.Method = RestSharp.Method.POST;
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
+                request.Method = RestSharp.Method.POST;
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //    }
-        //}
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+            }
+        }
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_JsonRequestContentDifferentLetterCase_NotImplementedRespondHttpStatus()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedContent(new { Name = "TesT", Id = 23, IsOld = true }, RequestContentType.Json)
-        //            .Response(HttpStatusCode.OK);
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_JsonRequestContentDifferentLetterCase_NotImplementedRespondHttpStatus()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithContentType(ContentTypes.Json)
+                    .WithJsonContent(new { Name = "TesT", Id = 23, IsOld = true })
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
-        //        request.Method = RestSharp.Method.POST;
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
+                request.Method = RestSharp.Method.POST;
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //    }
-        //}
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.NotImplemented, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+            }
+        }
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_JsonValidRequestContent_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedContent(new { Name = "test", IsOld = true, Id = 23 }, RequestContentType.Json)
-        //            .Response(HttpStatusCode.OK);
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_JsonValidRequestContent_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithContentType(ContentTypes.Json)
+                    .WithJsonContent(new { Name = "test", IsOld = true, Id = 23 })
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
-        //        request.Method = RestSharp.Method.POST;
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
+                request.Method = RestSharp.Method.POST;
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //    }
-        //}
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+            }
+        }
 
-        //[TestMethod]
-        //[TestCategory("ThreadNotSafe")]
-        //public void HHttpServer_JsonStringContent_Ok()
-        //{
-        //    using (var hserver = new HttpServerMock(TestServerPort))
-        //    {
-        //        hserver.SetUpPostExpectation("http://localhost:50000/user/23")
-        //            .ExpectedContent("{\"Name\":\"test\", \"IsOld\":true, \"Id\":23}", RequestContentType.Json)
-        //            .Response(HttpStatusCode.OK);
+        [TestMethod]
+        [TestCategory("ThreadNotSafe")]
+        public void HHttpServer_JsonStringContent_Ok()
+        {
+            using (var hserver = new HttpServerMock(TestServerPort))
+            {
+                hserver.SetupExpectation(new RequestExpectationBuilder()
+                    .WithMethod(Method.POST)
+                    .WithUri("http://localhost:50000/user/23")
+                    .WithContentType(ContentTypes.Json)
+                    .WithJsonContent("{\"Name\":\"test\", \"IsOld\":true, \"Id\":23}")
+                    .WithResponseBuilder(new ExpectationResponseBuilder()
+                        .WithStatusCode(StatusCode.OK))
+                    .Build());
 
-        //        var restClient = new RestClient(this.serverBaseUrl);
-        //        var request = new RestRequest("/user/23");
-        //        request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
-        //        request.Method = RestSharp.Method.POST;
+                var restClient = new RestClient(this.serverBaseUrl);
+                var request = new RestRequest("/user/23");
+                request.AddJsonBody(new { Name = "test", Id = 23, IsOld = true });
+                request.Method = RestSharp.Method.POST;
 
-        //        var response = restClient.Execute(request);
-        //        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
-        //        Assert.IsNull(response.ErrorException, "The request contains an exception.");
-        //    }
-        //}
+                var response = restClient.Execute(request);
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, "The respond status code is not the expected.");
+                Assert.IsNull(response.ErrorException, "The request contains an exception.");
+            }
+        }
 
         //[TestMethod]
         //[TestCategory("ThreadNotSafe")]
