@@ -4,14 +4,12 @@ using HttpServerMock.Common.Model;
 namespace HttpServerMock.ExtensionMethods
 {
 
-    using global::HttpServerMock.Exceptions;
+    using Exceptions;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Net.Http;
-    using Method = global::HttpServerMock.Common.Model.Method;
 
     /// <summary>
     /// Extension methods for HttpServerMock class.
@@ -36,12 +34,12 @@ namespace HttpServerMock.ExtensionMethods
             this HttpServerMock serverMock,
             Method method,
             string requetsUri,
-            uint times = 1,
+            int times = 1,
             string name = "",
             string expectedContentType = "None",
             T expectedRequestContent = null,
             IDictionary<string, string> expectedRequestHeaders = null,
-            Func<HttpRequestMessage, bool> requestValidator = null) where T : class
+            Func<Request, bool> requestValidator = null) where T : class
         {
             return CreateHttpServerExpectation(
                 serverMock,
@@ -50,9 +48,23 @@ namespace HttpServerMock.ExtensionMethods
                 name,
                 times,
                 expectedContentType,
-                expectedRequestContent,
+                new Common.Model.StringContent(JsonConvert.SerializeObject(expectedRequestContent)),
                 expectedRequestHeaders,
                 requestValidator);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serverMock"></param>
+        /// <param name="expectation"></param>
+        /// <returns></returns>
+        public static IRequestExpectation SetupExpectation(this HttpServerMock serverMock,
+            IRequestExpectation expectation)
+        {
+            serverMock.ServerRequestsState.AddExpectaction(expectation);
+
+            return expectation;
         }
 
         /// <summary>
@@ -69,7 +81,7 @@ namespace HttpServerMock.ExtensionMethods
             Method method,
             string requetsUri,
             string name = "",
-            uint times = 1)
+            int times = 1)
         {
             return CreateHttpServerExpectation(
                 serverMock,
@@ -99,12 +111,12 @@ namespace HttpServerMock.ExtensionMethods
         public static IRequestExpectation SetUpGetExpectation<T>(
             this HttpServerMock serverMock,
             string requetsUri,
-            uint times = 1,
+            int times = 1,
             string name = "",
             string expectedContentType = "None",
             T expectedRequestContent = null,
             IDictionary<string, string> expectedRequestHeaders = null,
-            Func<HttpRequestMessage, bool> requestValidator = null) where T : class
+            Func<Request, bool> requestValidator = null) where T : class
         {
             return CreateHttpServerExpectation(
                 serverMock,
@@ -113,7 +125,7 @@ namespace HttpServerMock.ExtensionMethods
                 name,
                 times,
                 expectedContentType,
-                expectedRequestContent,
+                new Common.Model.StringContent(JsonConvert.SerializeObject(expectedRequestContent)),
                 expectedRequestHeaders,
                 requestValidator);
         }
@@ -126,11 +138,11 @@ namespace HttpServerMock.ExtensionMethods
         /// <param name="name">The name.</param>
         /// <param name="times">The times.</param>
         /// <returns></returns>
-        public static RequestExpectation SetUpGetExpectation(
+        public static IRequestExpectation SetUpGetExpectation(
             this HttpServerMock serverMock,
             string requetsUri,
             string name = "",
-            uint times = 1)
+            int times = 1)
         {
             return CreateHttpServerExpectation(
                 serverMock,
@@ -138,7 +150,7 @@ namespace HttpServerMock.ExtensionMethods
                 requetsUri,
                 name,
                 times,
-                RequestContentType.None,
+                "None",
                 null,
                 null,
                 null);
@@ -157,15 +169,15 @@ namespace HttpServerMock.ExtensionMethods
         /// <param name="expectedRequestHeaders">The expected request headers.</param>
         /// <param name="requestValidator">The request validator.</param>
         /// <returns></returns>
-        public static RequestExpectation SetUpPostExpectation<T>(
+        public static IRequestExpectation SetUpPostExpectation<T>(
             this HttpServerMock serverMock,
             string requetsUri,
-            uint times = 1,
+            int times = 1,
             string name = "",
-            RequestContentType expectedContentType = RequestContentType.None,
+            string expectedContentType = "None",
             T expectedRequestContent = null,
             IDictionary<string, string> expectedRequestHeaders = null,
-            Func<HttpRequestMessage, bool> requestValidator = null) where T : class
+            Func<Request, bool> requestValidator = null) where T : class
         {
             return CreateHttpServerExpectation(
                 serverMock,
@@ -174,7 +186,7 @@ namespace HttpServerMock.ExtensionMethods
                 name,
                 times,
                 expectedContentType,
-                expectedRequestContent,
+                new Common.Model.StringContent(JsonConvert.SerializeObject(expectedRequestContent)),
                 expectedRequestHeaders,
                 requestValidator);
         }
@@ -187,11 +199,11 @@ namespace HttpServerMock.ExtensionMethods
         /// <param name="name">The name.</param>
         /// <param name="times">The times.</param>
         /// <returns></returns>
-        public static RequestExpectation SetUpPostExpectation(
+        public static IRequestExpectation SetUpPostExpectation(
             this HttpServerMock serverMock,
             string requetsUri,
             string name = "",
-            uint times = 1)
+            int times = 1)
         {
             return CreateHttpServerExpectation(
                 serverMock,
@@ -199,7 +211,7 @@ namespace HttpServerMock.ExtensionMethods
                 requetsUri,
                 name,
                 times,
-                RequestContentType.None,
+                "None",
                 null,
                 null,
                 null);
@@ -214,25 +226,26 @@ namespace HttpServerMock.ExtensionMethods
         {
             const string ErrorMessageFormat = "Request Name:'{0}' | Request Uri: '{1}' | Request Method: '{2}' | Expected Request Headers: '{3}' | Expected Request Content: '{4}' | Expected Request Content Type: '{5}' | Expected Number Of Calls: '{6}' | Actual Number Of Calls: '{7}'";
 
-            var uncompletedExpectations = serverMock.ServerRequestsState.RequestExpectations.Where(requestExpectation => requestExpectation.Repeats != requestExpectation.NumberOfCallsPerformed).ToList();
+            var uncompletedExpectations = serverMock.ServerRequestsState.RequestExpectations.Where(requestExpectation => !requestExpectation.Fulfilled).ToList();
 
             if (uncompletedExpectations.Any())
             {
                 var errorMessageList = uncompletedExpectations.Select(expect =>
                     {
-                        string serializedHeaders = string.Join("|", expect.ExpectedRequestHeaders.Select(header => string.Concat(header.Key, " - ", header.Value)));
-                        string requestContent = JsonConvert.SerializeObject(expect.ExpectedRequestContent);
+                        string serializedHeaders = string.Join("|", expect.RequestHeaders.Select(header => string.Concat(header.Key, " - ", header.Value)));
+                        string requestContent = JsonConvert.SerializeObject(expect.Content);
 
                         return new
                         {
                             Name = expect.Name,
-                            Uri = expect.RequestUri.AbsoluteUri,
+                            Uri = (expect as UrlRequestExpectation)?.Uri.AbsolutePath,
+                            Regex = (expect as RegexRequestExpectation)?.Regex,
                             Headers = serializedHeaders,
-                            Method = expect.RequestHttpMethod.ToString(),
+                            Method = expect.Method.ToString(),
                             Content = requestContent,
-                            ContentType = expect.ExpectedRequestContentType.ToString(),
-                            ExpectedNumberOfCalls = expect.Repeats,
-                            ActualNumberOfCalls = expect.NumberOfCallsPerformed
+                            ContentType = expect.ContentType.ToString(),
+                            ExpectedNumberOfCalls = expect.ExpectedNumberOfCalls,
+                            ActualNumberOfCalls = expect.ActualNumberOfCalls
                         };
                     }).Select(
                     formattedExpect =>
@@ -280,7 +293,7 @@ namespace HttpServerMock.ExtensionMethods
                         return string.Format(
                             CultureInfo.InvariantCulture,
                             ErrorMessageFormat,
-                            unexpected.RequestUri.AbsoluteUri,
+                            unexpected.Uri.AbsoluteUri,
                             unexpected.Method.ToString(),
                             serializedHeaders,
                             unexpected.Content);

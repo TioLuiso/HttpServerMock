@@ -1,6 +1,10 @@
-﻿namespace HttpServerMock.Common.Model
+﻿using System;
+using System.IO;
+
+namespace HttpServerMock.Common.Model
 {
-    public interface IContent
+    public interface IContent : IEquatable<IContent>
     {
+        void Write(Stream stream);
     }
 }

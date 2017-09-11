@@ -64,8 +64,7 @@ namespace HttpServerMock
             var requestMapper = new RequestMapper();
             var requestProcessor = new RequestProcessor(this.ServerRequestsState);
             var responseMapper = new ResponseMapper();
-            var mockProcessor = new MockProcessor(null, requestMapper, responseMapper, requestProcessor);
-            var startup = new Startup(mockProcessor);
+            var startup = new Startup(requestMapper, responseMapper, requestProcessor);
 
             this.webapp = WebApp.Start(options, builder => startup.Configuration(builder));
         }

@@ -1,4 +1,5 @@
-﻿using Owin;
+﻿using HttpServerMock.Common;
+using Owin;
 
 namespace HttpServerMock
 {
@@ -7,23 +8,27 @@ namespace HttpServerMock
     /// </summary>
     public class Startup
     {
-        private readonly MockProcessor mockProcessor;
+        private readonly IRequestMapper requestMapper;
+        private readonly IResponseMapper responseMapper;
+        private readonly IRequestProcessor requestProcessor;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="mockProcessor"></param>
-        public Startup(MockProcessor mockProcessor)
+        public Startup(IRequestMapper requestMapper, IResponseMapper responseMapper, IRequestProcessor requestProcessor)
         {
-            this.mockProcessor = mockProcessor;
+            this.requestMapper = requestMapper;
+            this.responseMapper = responseMapper;
+            this.requestProcessor = requestProcessor;
         }
+
         /// <summary>
         /// Configuration of Owin application
         /// </summary>
         /// <param name="builder">App builder</param>
         public void Configuration(IAppBuilder builder)
         {
-            builder.Use(this.mockProcessor);
+            builder.Use<MockProcessor>(this.requestMapper, this.responseMapper, this.requestProcessor);
         }
     }
 }

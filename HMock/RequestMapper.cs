@@ -38,8 +38,11 @@ namespace HttpServerMock
             {
                 contextRequestBody.CopyTo(targetStream);
                 var binaryContent = targetStream.ToArray();
-                if (Helper.IsJsonRequest(contentType)
-                    || Helper.IsXmlRequest(contentType))
+                if (Helper.IsJsonRequest(contentType))
+                {
+                    return new JsonContent(Encoding.UTF8.GetString(binaryContent));
+                }
+                else if(Helper.IsXmlRequest(contentType))
                 {
                     return new StringContent(Encoding.UTF8.GetString(binaryContent));
                 }

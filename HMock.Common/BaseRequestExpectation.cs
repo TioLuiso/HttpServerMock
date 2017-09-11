@@ -8,8 +8,6 @@ namespace HttpServerMock.Common
 {
     public abstract class BaseRequestExpectation : IRequestExpectation
     {
-        private int doneCalls;
-
         protected BaseRequestExpectation(string name, string contentType, Method method, IDictionary<string, IEnumerable<string>> headers, IContent content, int numberOfCalls, Func<Request, bool> validator, IExpectationResponseBuilder responseBuilder)
         {
             Name = name;
@@ -17,7 +15,7 @@ namespace HttpServerMock.Common
             Method = method;
             this.RequestHeaders = headers;
             Content = content;
-            NumberOfCalls = numberOfCalls;
+            this.ExpectedNumberOfCalls = numberOfCalls;
             Validator = validator;
             ResponseBuilder = responseBuilder;
         }
@@ -28,7 +26,9 @@ namespace HttpServerMock.Common
         public IDictionary<string, IEnumerable<string>> RequestHeaders { get; }
         public IContent Content { get; }
         public IExpectationResponseBuilder ResponseBuilder { get; }
-        public int NumberOfCalls { get; }
+        public int ExpectedNumberOfCalls { get; }
+        public int ActualNumberOfCalls { get; private set; }
+        public bool Fulfilled => this.ActualNumberOfCalls == this.ExpectedNumberOfCalls;
         public Func<Request, bool> Validator { get; }
 
         public bool CanProcessRequest(Request request)
@@ -44,7 +44,7 @@ namespace HttpServerMock.Common
 
         public Task<Response> ProcessRequest(Request request)
         {
-            this.doneCalls++;
+            this.ActualNumberOfCalls++;
             return this.ResponseBuilder.BuildAsync(request);
         }
 
@@ -52,7 +52,7 @@ namespace HttpServerMock.Common
 
         private bool ValidateContentType(Request request)
         {
-            return request.ContentType.Contains(this.ContentType);
+            return this.ContentType == null || request.ContentType.Contains(this.ContentType);
         }
 
         private bool ValidateMethod(Request request)
@@ -66,7 +66,7 @@ namespace HttpServerMock.Common
             {
                 foreach (var expectedHeaderKey in this.RequestHeaders.Keys)
                 {
-                    if (!request.Headers.TryGetValue(expectedHeaderKey, out var requestHeader))
+                    if (request.Headers.TryGetValue(expectedHeaderKey, out var requestHeader))
                     {
                         var expectedHeader = this.RequestHeaders[expectedHeaderKey];
                         if (expectedHeader.Except(requestHeader).Any())
@@ -96,7 +96,7 @@ namespace HttpServerMock.Common
 
         private bool ValidatePendingCalls()
         {
-            return this.NumberOfCalls > this.doneCalls;
+            return !this.Fulfilled;
         }
     }
 }

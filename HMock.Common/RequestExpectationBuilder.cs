@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using HttpServerMock.Common.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace HttpServerMock.Common
 {
@@ -13,8 +14,8 @@ namespace HttpServerMock.Common
         private string regex;
         private string contentType;
         private Method method;
-        private IDictionary<string, IEnumerable<string>> headers;
-        private int numberOfCalls;
+        private IDictionary<string, List<string>> headers = new Dictionary<string, List<string>>();
+        private int numberOfCalls = 1;
         private IExpectationResponseBuilder responseBuilder;
         private IContent content;
         private Func<Request, bool> validator = r => true;
@@ -57,19 +58,55 @@ namespace HttpServerMock.Common
 
         public IRequestExpectationBuilder WithHeaders(IDictionary<string, string> headers)
         {
-            this.headers = headers.ToDictionary(h => h.Key, h => new[] {h.Value}.Select(h2 => h2));
+            this.headers = headers.ToDictionary(h => h.Key, h => new List<string> {h.Value});
+            return this;
+        }
+
+        public IRequestExpectationBuilder WithHeader(string key, string value)
+        {
+            if (!this.headers.ContainsKey(key))
+            {
+                this.headers.Add(key, new List<string>());
+            }
+
+            this.headers[key].Add(value);
+
             return this;
         }
 
         public IRequestExpectationBuilder WithHeaders(IDictionary<string, IEnumerable<string>> headers)
         {
-            this.headers = headers;
+            this.headers = headers.ToDictionary(h => h.Key, h => h.Value.ToList());
             return this;
         }
 
         public IRequestExpectationBuilder WithContent(IContent content)
         {
             this.content = content;
+            return this;
+        }
+
+        public IRequestExpectationBuilder WithStringContent(string content)
+        {
+            this.content = new StringContent(content);
+            return this;
+        }
+
+        public IRequestExpectationBuilder WithBinaryContent(byte[] content)
+        {
+            this.content = new BinaryContent(content);
+            return this;
+        }
+
+        public IRequestExpectationBuilder WithJsonContent(string content)
+        {
+            this.content = new JsonContent(JToken.Parse(content));
+            return this;
+        }
+
+        public IRequestExpectationBuilder WithJsonContent(JToken content)
+        {
+            this.content = new JsonContent(content);
             return this;
         }
 
@@ -95,12 +132,12 @@ namespace HttpServerMock.Common
         {
             if (this.regex != null && this.uri == null)
             {
-                return new RegexRequestExpectation(this.name, this.regex, this.contentType, this.method, this.headers, this.content, numberOfCalls, this.validator, this.responseBuilder);
+                return new RegexRequestExpectation(this.name, this.regex, this.contentType, this.method, this.headers.ToDictionary(h => h.Key, h => h.Value.Select(v => v)), this.content, numberOfCalls, this.validator, this.responseBuilder);
             }
 
             if (this.uri != null && this.regex == null)
             {
-                return new UrlRequestExpectation(this.name, this.uri, this.contentType, this.method, this.headers, this.content, numberOfCalls, this.validator, this.responseBuilder);
+                return new UrlRequestExpectation(this.name, this.uri, this.contentType, this.method, this.headers.ToDictionary(h => h.Key, h => h.Value.Select(v => v)), this.content, numberOfCalls, this.validator, this.responseBuilder);
             }
 
             throw new InvalidOperationException("Exactly one of uri or regex must be set");
